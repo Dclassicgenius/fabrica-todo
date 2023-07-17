@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@types/uuid": "^9.0.2",
-    "daisyui": "^3.2.1",
     "json-server": "^0.17.3"
   }
 }
