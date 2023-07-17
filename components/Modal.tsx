@@ -1,10 +1,22 @@
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Backdrop from "./BackDrop";
+import { FormEvent, ReactNode } from "react";
+import useModal from "@/hook/useModal";
 
 interface ModalProps {
   children: React.ReactNode;
   handleClose: () => void;
+  modalOpen: boolean;
 }
+
+interface ModalContainerProps {
+  children: ReactNode;
+}
+
+const ModalContainer = ({ children }: ModalContainerProps) => (
+  // Enables the animation of components that have been removed from the tree
+  <AnimatePresence>{children}</AnimatePresence>
+);
 
 const dropIn = {
   hidden: {
@@ -27,20 +39,24 @@ const dropIn = {
   },
 };
 
-const Modal = ({ children, handleClose }: ModalProps) => {
+const Modal = ({ children, handleClose, modalOpen }: ModalProps) => {
   return (
-    <Backdrop onClick={handleClose}>
-      <motion.dialog
-        onClick={(e) => e.stopPropagation()} // Prevent click from closing modal
-        className="orange-gradient modal modal-bottom sm:modal-middle"
-        variants={dropIn}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-      >
-        {children}
-      </motion.dialog>
-    </Backdrop>
+    <ModalContainer>
+      {modalOpen && (
+        <Backdrop onClick={handleClose}>
+          <motion.dialog
+            onClick={(e) => e.stopPropagation()} // Prevent click from closing modal
+            className="orange-gradient modal modal-bottom sm:modal-middle"
+            variants={dropIn}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {children}
+          </motion.dialog>
+        </Backdrop>
+      )}
+    </ModalContainer>
   );
 };
 

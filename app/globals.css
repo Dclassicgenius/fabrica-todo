@@ -12,7 +12,6 @@
 }
 
 body {
-  background: var(--dark);
   font-family: "Montserrat", sans-serif;
   height: 100%;
 }
@@ -35,7 +34,6 @@ button {
   height: 3rem;
   border: none;
   outline: none;
-  -webkit-appearance: none;
   border-radius: 4px;
   font-weight: 600;
   font-size: 1.25rem;
@@ -46,10 +44,10 @@ button {
 
 .modal {
   width: clamp(50%, 700px, 90%);
-  height: min(50%, 375px);
+  height: min(50%, auto);
 
   margin: auto;
-  padding: 0 2rem;
+  padding: 1rem 2rem;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -71,17 +69,6 @@ button {
   background: var(--gradient);
   color: var(--dark);
 }
-
-/* .save-button {
-  padding: 0 1rem;
-  margin: 2rem auto auto 0;
-  background: var(--gradient);
-  color: var(--dark);
-} */
-
-/* .pink {
-  @apply text-[#c273ff];
-} */
 
 .orange-gradient {
   background: var(--gradient);

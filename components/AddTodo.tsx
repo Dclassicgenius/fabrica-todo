@@ -1,49 +1,40 @@
 "use client";
 
 import useModal from "@/hook/useModal";
-import { AnimatePresence, motion } from "framer-motion";
-import { ReactNode } from "react";
+import { motion } from "framer-motion";
+import { FormEvent, useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import Modal from "./Modal";
 import Form from "./Form";
-
-interface ModalContainerProps {
-  children: ReactNode;
-}
-
-interface ModalButtonProps {
-  label: string;
-  onClick: () => void;
-}
-
-const ModalContainer = ({ children }: ModalContainerProps) => (
-  // Enables the animation of components that have been removed from the tree
-  <AnimatePresence>{children}</AnimatePresence>
-);
-
-const ModalButton = ({ onClick, label }: ModalButtonProps) => (
-  <motion.button
-    className="modal-button"
-    type="button"
-    whileHover={{ scale: 1.1 }}
-    whileTap={{ scale: 0.95 }}
-    onClick={onClick}
-  >
-    {label}
-  </motion.button>
-);
+import { addTask } from "@/api/api";
+import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
+import ModalButton from "./ModalButton";
 
 const AddTodo = () => {
+  const [task, setTask] = useState({ id: "", text: "", completed: false });
+
+  const router = useRouter();
+
   const { modalOpen, close, open } = useModal();
-  const createTask = () => {};
+  const createTask = async (e: FormEvent) => {
+    e.preventDefault();
 
-  const task = {
-    id: "1",
-    text: "New task",
-    completed: false,
+    try {
+      await addTask({
+        id: uuidv4(),
+        text: task.text,
+        completed: task.completed,
+      });
+
+      setTask({ id: "", text: "", completed: false });
+    } catch (error) {
+      console.log(error);
+    }
+
+    close();
+    router.refresh();
   };
-
-  const setTask = () => {};
 
   return (
     <div>
@@ -52,40 +43,28 @@ const AddTodo = () => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={open}
-        className="add-button flex items-center mx-auto gap-2 my-5"
+        className="add-button flex items-center mx-auto gap-2 my-5 cursor-pointer"
       >
         Add new task <AiOutlinePlus size={18} />
       </motion.button>
 
-      <ModalContainer>
-        {modalOpen && (
-          <Modal handleClose={close}>
-            {/* <form>
-              <h3 className="font-bold text-lg">Add new task</h3>
-              <div className="modal-action">
-                <input
-                  //   value={newTaskValue}
-                  //   onChange={(e) => setNewTaskValue(e.target.value)}
-                  type="text"
-                  placeholder="Type here"
-                  className="input input-bordered w-full"
-                />
-                <button type="submit" className="btn">
-                  Submit
-                </button>
-              </div>
-            </form> */}
+      <Modal handleClose={close} modalOpen={modalOpen}>
+        <Form
+          type="Create"
+          handleSubmit={createTask}
+          task={task}
+          setTask={setTask}
+        />
 
-            <Form
-              type="Create"
-              handleSubmit={createTask}
-              task={task}
-              setTask={setTask}
-            />
-            <ModalButton onClick={close} label="Submit" />
-          </Modal>
-        )}
-      </ModalContainer>
+        <div className=" flex mt-14 gap-5">
+          <ModalButton
+            onClick={createTask}
+            label="Submit"
+            disabled={!task.text}
+          />
+          <ModalButton onClick={close} label="Close" />
+        </div>
+      </Modal>
     </div>
   );
 };

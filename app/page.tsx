@@ -1,24 +1,26 @@
+import { getAllTasks } from "@/api/api";
 import AddTodo from "@/components/AddTodo";
+import Filter from "@/components/Filter";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 import TodoList from "@/components/TodoList";
-import useModal from "@/hook/useModal";
+import { BsFillMoonStarsFill, BsFillSunFill } from "react-icons/bs";
 
-export default function Home() {
-  const tasks = [
-    { id: "1", text: "text 1", completed: true },
-    { id: "2", text: "text 2", completed: false },
-    { id: "3", text: "text 3", completed: true },
-    { id: "4", text: "text 4", completed: false },
-    { id: "5", text: "text 5", completed: true },
-  ];
+export default async function Home() {
+  const tasks = await getAllTasks();
+
   return (
-    <main className="max-w-4xl mx-auto mt-4">
+    <main className="max-w-4xl mx-auto mt-4 px-7">
       <div className="text-center mb-5 flex flex-col gap-4">
+        {/* <div className="flex gap-4 justify-end pr-7">
+          <BsFillMoonStarsFill size={20} />
+          <BsFillSunFill size={20} />
+        </div> */}
+        <ThemeSwitcher />
         <h1 className="text-4xl font-bold text-primary-pink">Todo List App</h1>
-        <AddTodo />
 
-        {/* <button onClick={open}>Open</button> */}
+        <AddTodo />
       </div>
-      <TodoList tasks={tasks} />
+      <Filter tasks={tasks} />
     </main>
   );
 }

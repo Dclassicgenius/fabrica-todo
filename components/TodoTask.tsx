@@ -1,10 +1,14 @@
 "use client";
 
-import { FormEventHandler, useState } from "react";
+import { FormEvent, FormEventHandler, useState } from "react";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import Modal from "./Modal";
 import { useRouter } from "next/navigation";
 import { ITask } from "@/types";
+import useModal from "@/hook/useModal";
+import Form from "./Form";
+import ModalButton from "./ModalButton";
+import { deleteTodo, editTodo } from "@/api/api";
 
 interface TaskProps {
   task: ITask;
@@ -12,24 +16,52 @@ interface TaskProps {
 
 const TodoTask = ({ task }: TaskProps) => {
   const router = useRouter();
-  const [openModalEdit, setOpenModalEdit] = useState<boolean>(false);
-  const [openModalDeleted, setOpenModalDeleted] = useState<boolean>(false);
-  const [taskToEdit, setTaskToEdit] = useState<string>(task.text);
+  const {
+    modalOpen: editModalOpen,
+    close: closeEditModal,
+    open: openEditModal,
+  } = useModal();
+  const {
+    modalOpen: deleteModalOpen,
+    close: closeDeleteModal,
+    open: openDeleteModal,
+  } = useModal();
+  const [taskToEdit, setTaskToEdit] = useState({
+    id: "",
+    text: "",
+    completed: false,
+  });
 
-  const handleSubmitEditTodo: FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
-    // await editTodo({
-    //   id: task.id,
-    //   text: taskToEdit,
-    // });
-    // setOpenModalEdit(false);
-    // router.refresh();
+  const handleToggleTask = async () => {
+    const updatedTask = {
+      ...task,
+      completed: !task.completed,
+    };
+
+    await editTodo(updatedTask);
+    router.refresh();
   };
 
+  const handleSubmitEditTodo = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      await editTodo({
+        id: task.id,
+        text: taskToEdit.text,
+        completed: taskToEdit.completed,
+      });
+
+      setTaskToEdit({ id: "", text: "", completed: false });
+    } catch (error) {
+      console.log(error);
+    }
+    router.refresh();
+    closeEditModal();
+  };
   const handleDeleteTask = async (id: string) => {
-    // await deleteTodo(id);
-    // setOpenModalDeleted(false);
-    // router.refresh();
+    await deleteTodo(id);
+    closeDeleteModal();
+    router.refresh();
   };
 
   return (
@@ -39,6 +71,7 @@ const TodoTask = ({ task }: TaskProps) => {
           <input
             type="checkbox"
             checked={task.completed}
+            onChange={handleToggleTask}
             className=" w-6 h-6 dark:border-primary-orange accent-primary-pink"
           />
           <span className={task.completed ? ` line-through italic` : ""}>
@@ -49,44 +82,50 @@ const TodoTask = ({ task }: TaskProps) => {
       <td>
         <div className="flex gap-5">
           <FiEdit
-            onClick={() => setOpenModalEdit(true)}
+            onClick={() => {
+              setTaskToEdit(task);
+              openEditModal();
+            }}
             cursor="pointer"
             className="text-primary-blue"
             size={25}
           />
-          {/* <Modal modalOpen={openModalEdit} setModalOpen={setOpenModalEdit}>
-            <form onSubmit={handleSubmitEditTodo}>
-              <h3 className='font-bold text-lg'>Edit task</h3>
-              <div className='modal-action'>
-                <input
-                  value={taskToEdit}
-                  onChange={(e) => setTaskToEdit(e.target.value)}
-                  type='text'
-                  placeholder='Type here'
-                  className='input input-bordered w-full'
-                />
-                <button type='submit' className='btn'>
-                  Submit
-                </button>
-              </div>
-            </form>
-          </Modal> */}
+          <Modal handleClose={closeEditModal} modalOpen={editModalOpen}>
+            <Form
+              type="Edit"
+              handleSubmit={handleSubmitEditTodo}
+              task={taskToEdit}
+              setTask={setTaskToEdit}
+            />
+
+            <div className=" flex mt-14 gap-5">
+              <ModalButton
+                onClick={handleSubmitEditTodo}
+                label="Submit"
+                disabled={!taskToEdit.text}
+              />
+              <ModalButton onClick={closeEditModal} label="Close" />
+            </div>
+          </Modal>
           <FiTrash2
-            onClick={() => setOpenModalDeleted(true)}
+            onClick={openDeleteModal}
             cursor="pointer"
             className="text-red-500"
             size={25}
           />
-          {/* <Modal modalOpen={openModalDeleted} setModalOpen={setOpenModalDeleted}>
-            <h3 className='text-lg'>
+          <Modal handleClose={closeDeleteModal} modalOpen={deleteModalOpen}>
+            <h3 className="text-2xl">
               Are you sure, you want to delete this task?
             </h3>
-            <div className='modal-action'>
-              <button onClick={() => handleDeleteTask(task.id)} className='btn'>
-                Yes
-              </button>
+
+            <div className=" flex mt-14 gap-5">
+              <ModalButton
+                onClick={() => handleDeleteTask(task.id)}
+                label="Delete"
+              />
+              <ModalButton onClick={closeDeleteModal} label="Close" />
             </div>
-          </Modal> */}
+          </Modal>
         </div>
       </td>
     </tr>
