@@ -1,22 +1,21 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { BsFillMoonStarsFill, BsFillSunFill } from "react-icons/bs";
 
-function getTheme() {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme) {
-    return savedTheme;
-  } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    return "dark";
-  } else {
-    return "light";
-  }
-}
-
 export default function ThemeSwitcher() {
-  const [darkMode, setDarkMode] = useState(getTheme() === "dark");
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const theme = savedTheme
+      ? savedTheme
+      : window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+
+    setDarkMode(theme === "dark");
+
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const listener = (e: MediaQueryListEvent) => setDarkMode(e.matches);
     mediaQuery.addEventListener("change", listener);
