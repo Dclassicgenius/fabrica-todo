@@ -8,11 +8,16 @@
     {
       "id": "0d71063f-2d81-4119-9b5a-ffeadd4392b0",
       "text": "Study programming in GO",
-      "completed": false
+      "completed": true
     },
     {
       "id": "a1e6ec47-0edc-4e05-8bef-0756efc40004",
       "text": "Ride a bike To the city center",
+      "completed": false
+    },
+    {
+      "id": "08ad3c63-2fe0-4431-b362-f8127442a61f",
+      "text": "Go for a walk",
       "completed": false
     }
   ]

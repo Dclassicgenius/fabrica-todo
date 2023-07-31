@@ -1,6 +1,9 @@
 import { ITask } from "@/types";
 
-const baseUrl = "http://localhost:30001";
+const baseUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://drim-todo.onrender.com"
+    : "http://localhost:30001";
 
 export const getAllTasks = async (): Promise<ITask[]> => {
   try {
